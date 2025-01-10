@@ -1,35 +1,50 @@
 import express, { Application } from "express";
-import subcategoryRouter from "./subcategories/subcategory.router";
 import categoriesRouter from "./categories/categories.route";
-import globalErrorHandler from "./middleware/errors.middleware";
-import ApiError from "./utils/apiErrors";
-import productRouter from "./products/product.router";
-
+import subcategoriesRoute from "./subcategories/subcategory.router";
+import globalErrors from "./middleware/errors.middleware";
+import ApiErrors from "./utils/apiErrors";
+import productsRoute from "./products/product.router";
+import usersRoute from "./users/users.route";
+import authRoute from "./auth/auth.route";
+import profileRoute from "./profile/profile.route";
+import googleRoute from "./google/google.routes";
+import wishlistRoute from "./wishlist/wishlist.routes";
+import addressRoute from "./booking/booking.routes";
+import reviewsRoute from "./reviews/reviews.routes";
+import cartRoute from "./cart/cart.routes";
+import orderRoute from "./order/order.routes";
 
 declare module "express" {
+  interface Request {
+    filterData?: any;
+    files?: any;
+    user?: any;
+  }
+}
 
-
-    interface Request {
-
-        filterData ? : any
-        files ? : any
+const mountRoutes: (app: Application) => void = (app: express.Application) => {
+  app.use("/auth/google", googleRoute);
+  app.use("/api/v1/categories", categoriesRouter);
+  app.use("/api/v1/subcategories", subcategoriesRoute);
+  app.use("/api/v1/products", productsRoute);
+  app.use("/api/v1/users", usersRoute);
+  app.use("/api/v1/auth", authRoute);
+  app.use("/api/v1/profile", profileRoute);
+  app.use("/api/v1/wishlist", wishlistRoute);
+  app.use("/api/v1/address", addressRoute);
+  app.use("/api/v1/reviews", reviewsRoute);
+  app.use("/api/v1/cart", cartRoute);
+  app.use("/api/v1/order", orderRoute);
+  app.all(
+    "*",
+    (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      next(new ApiErrors(`route ${req.originalUrl} not found`, 400));
     }
-}
-
-    
-const Routes : (app : Application) => void = (app: express.Application) : void => {
-
-    app.use('/api/v1/categories', categoriesRouter);
-    app.use('/api/v1/subcategories', subcategoryRouter);
-    app.use('/api/v1/products',productRouter);
-    
-    app.all('*', (req:express.Request, res:express.Response, next:express.NextFunction) => {
-        
-        next(new ApiError(`Route ${req.originalUrl} not found`, 404));
-    })
-    app.use(globalErrorHandler);
-
-}
-
-export default Routes
-
+  );
+  app.use(globalErrors);
+};
+export default mountRoutes;

@@ -1,96 +1,49 @@
 import mongoose from "mongoose";
-import { Products } from "./product.interface";
+import { IProducts } from "./product.interface";
 
+const productsSchema = new mongoose.Schema<IProducts>(
+  {
+    name: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Categories" },
+    subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "Subcategories" },
+    price: { type: Number, required: true },
+    discount: { type: Number },
+    priceAfterDiscount: { type: Number },
+    quantity: { type: Number, default: 0 },
+    sold: { type: Number, default: 0 },
+    rateAvg: { type: Number, default: 0 },
+    rating: { type: Number, default: 0 },
+    cover: String,
+    images: [String],
+  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
-const productsSchema = new mongoose.Schema<Products>({
+productsSchema.virtual("reviews", {
+  ref: "reviews",
+  foreignField: "product",
+  localField: "_id",
+});
 
-    name : {
-        type : String,
-        required : true,
-        trim : true
-    },
+const imagesUrl = (document: IProducts) => {
+  if (document.cover)
+    document.cover = `${process.env.BASE_URL}/images/products/${document.cover}`;
+  if (document.images) {
+    document.images = document.images.map(
+      (image) => `${process.env.BASE_URL}/images/products/${image}`
+    );
+  }
+};
 
-    cover : {
-        type : String,
-        trim : true
-    },
+productsSchema.post("init", imagesUrl).post("save", imagesUrl);
+productsSchema.pre<IProducts>(/^find/, function (next) {
+  let promise = this.populate({ path: "subcategory", select: "name image" });
+  next();
+});
 
-    images : {      
-
-        type : [String],
-        trim : true
-    },
-    
-    discount : {
-        type : Number,
-        min : 0,
-        max : 100
-    },
-
-    priceAfterDiscount : {
-        type : Number,
-        min : 0
-    },
-
-    sold : {
-        type : Number,      
-        min : 0,
-        default : 0
-    },
-
-    rating : {
-        type : Number,
-        min : 0,
-        max : 5,
-        default : 0
-    },
-
-    rateAvg : {
-        type : Number,
-        min : 0,
-        max : 5
-    },
-
-    description : {
-        type : String,
-        required : true,
-        trim : true
-    },
-
-    price : {
-        type : Number,
-        required : true,
-        min : 0
-    },
-
-    quantity : {
-        type : Number,
-        required : true,
-        min : 0,
-        default : 0
-    },
-
-    category : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Categories',
-        required: true
-    },
-    subcategory : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'Subcategories',
-        required: true
-    },
-
-
-},{timestamps : true})
-
-productsSchema.pre<Products>(/^find/, function(next)  {
-
-    this.populate({path : 'subcategory', select : ' -_id name'});
-    next();
-    
-    
-    })
-
-
-export default mongoose.model<Products>('Products',productsSchema);
+export default mongoose.model<IProducts>("products", productsSchema);
