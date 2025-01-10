@@ -1,16 +1,10 @@
-class ApiError extends Error {
+class ApiErrors extends Error {
+  private status: string;
 
-    private status : string;
-    // private isOperational : boolean;
-    
-
-    constructor(message : string , private statusCode : number) {
-
-        super(message); 
-        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-        // this.isOperational = true;
-
-    };
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.status = `${statusCode}`.startsWith("4") ? "failed" : "error";
+  }
 }
 
-export default ApiError;
+export default ApiErrors;
