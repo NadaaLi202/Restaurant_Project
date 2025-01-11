@@ -10,8 +10,7 @@ export class BookingValidation {
     body("time").notEmpty().withMessage("Time is required"),
     body("guests").notEmpty().withMessage("Guests is required"),
     body("occasion").notEmpty().withMessage("Occasion is required"),
-    body("message").notEmpty().withMessage("Message is required"),
-
+    body("message").optional(), // Optional field
     validatorMiddleware,
   ];
   updateBooking = [
