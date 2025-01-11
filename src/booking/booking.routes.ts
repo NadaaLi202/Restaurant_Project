@@ -1,24 +1,35 @@
-import { Router } from "express";
+import express from "express";
 import bookingService from "./booking.service";
 import authService from "../auth/auth.services";
 
-const bookingRouter: Router = Router();
+const router = express.Router();
 
-bookingRouter.get("/", authService.protectedRoutes, bookingService.getBooking);
-bookingRouter.post(
-  "/",
+// Get all bookings for a user
+router.get(
+  "/:userId/bookings",
+  authService.protectedRoutes,
+  bookingService.getBooking
+);
+
+// Create a booking for a user
+router.post(
+  "/:userId/bookings",
   authService.protectedRoutes,
   bookingService.makeBooking
 );
-bookingRouter.put(
-  "/:bookingId",
+
+// Update a booking for a user
+router.patch(
+  "/:userId/bookings/:bookingId",
   authService.protectedRoutes,
   bookingService.updateBooking
 );
-bookingRouter.delete(
-  "/:bookingId",
+
+// Cancel a booking for a user
+router.delete(
+  "/:userId/bookings/:bookingId",
   authService.protectedRoutes,
   bookingService.cancelBooking
 );
 
-export default bookingRouter;
+export default router;

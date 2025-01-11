@@ -22,6 +22,7 @@ const usersSchema = new mongoose.Schema<IUsers>(
     passwordResetCode: String,
     passwordResetCodeExpires: Date,
     passwordResetCodeVerify: Boolean,
+    booking: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
   },
   { timestamps: true }
 );

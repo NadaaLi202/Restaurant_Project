@@ -9,10 +9,10 @@ import authRoute from "./auth/auth.route";
 import profileRoute from "./profile/profile.route";
 import googleRoute from "./google/google.routes";
 import wishlistRoute from "./wishlist/wishlist.routes";
-import addressRoute from "./booking/booking.routes";
 import reviewsRoute from "./reviews/reviews.routes";
 import cartRoute from "./cart/cart.routes";
 import orderRoute from "./order/order.routes";
+import bookingRouter from "./booking/booking.routes";
 
 declare module "express" {
   interface Request {
@@ -31,7 +31,7 @@ const mountRoutes: (app: Application) => void = (app: express.Application) => {
   app.use("/api/v1/auth", authRoute);
   app.use("/api/v1/profile", profileRoute);
   app.use("/api/v1/wishlist", wishlistRoute);
-  app.use("/api/v1/address", addressRoute);
+  app.use("/api/v1/booking", bookingRouter);
   app.use("/api/v1/reviews", reviewsRoute);
   app.use("/api/v1/cart", cartRoute);
   app.use("/api/v1/order", orderRoute);
